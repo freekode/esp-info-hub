@@ -7,5 +7,10 @@
 **/lib/
 **/src/
 **/platformio.ini
-/secrets.yaml
+
 .idea
+
+secrets.yaml
+
+.DS_Store
+venv/

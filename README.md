@@ -1,2 +1,3 @@
-# esp-info-hub
-Indoor Info hub based on ESP8266
+# esp-at-home
+
+All home devices based on esphome
