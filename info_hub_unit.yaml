@@ -21,8 +21,8 @@ ota:
 i2c:
 
 time:
-  - platform: homeassistant
-    id: hatime
+  - platform: sntp
+    id: sntp_time
 
 sensor:
   - platform: homeassistant
@@ -38,15 +38,15 @@ sensor:
               id(tm1651_battery).set_level(7);
             } else if (x >= 15 && x <= 29) {
               id(tm1651_battery).set_level(6);
-            } else if (x >= 30 && x <= 44) {
+            } else if (x >= 30 && x <= 40) {
               id(tm1651_battery).set_level(5);
-            } else if (x >= 45 && x <= 59) {
+            } else if (x >= 41 && x <= 55) {
               id(tm1651_battery).set_level(4);
-            } else if (x >= 60 && x <= 74) {
+            } else if (x >= 56 && x <= 64) {
               id(tm1651_battery).set_level(3);
-            } else if (x >= 75 && x <= 84) {
+            } else if (x >= 65 && x <= 74) {
               id(tm1651_battery).set_level(2);
-            } else if (x >= 85) {
+            } else if (x >= 75) {
               id(tm1651_battery).set_level(1);
             }
 
@@ -114,7 +114,7 @@ display:
     dimensions: 20x4
     address: 0x27
     lambda: |-
-      it.strftime(0, 0, "%F  %T", id(hatime).now());
+      it.strftime(0, 0, "%F  %T", id(sntp_time).now());
       it.printf(0, 1, "   Temp    Hum   AQI");
       it.printf(0,  2, "I");
       it.printf(3,  2, "%.1ft", id(temperature).state);
