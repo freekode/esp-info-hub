@@ -1,0 +1,13 @@
+esphome:
+  name: ${node_name}_node
+  build_path: ../build/${node_name}
+
+logger:
+
+web_server:
+
+api:
+
+ota:
+
+i2c:

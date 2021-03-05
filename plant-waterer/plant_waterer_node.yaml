@@ -1,0 +1,93 @@
+substitutions:
+  node_name: plant_waterer
+
+esphome:
+  platform: ESP8266
+  board: nodemcuv2
+
+packages:
+  wifi: !include ../common/wifi.yaml
+  node_base: !include ../common/node_base.yaml
+
+mcp23008:
+  - id: 'mcp23008_hub'
+    address: 0x20
+
+output:
+  # motor controls
+  - platform: esp8266_pwm
+    pin: D5
+    id: speed_pin_m1
+  - platform: gpio
+    id: direction_pin0_m1
+    pin:
+      mcp23008: mcp23008_hub
+      number: 7
+      mode: OUTPUT
+  - platform: gpio
+    id: direction_pin1_m1
+    pin:
+      mcp23008: mcp23008_hub
+      number: 6
+      mode: OUTPUT
+  # relay controls
+  - platform: gpio
+    id: relay1
+    pin:
+      mcp23008: mcp23008_hub
+      number: 5
+      mode: OUTPUT
+      inverted: true
+  - platform: gpio
+    id: relay2
+    pin:
+      mcp23008: mcp23008_hub
+      number: 4
+      mode: OUTPUT
+      inverted: true
+  - platform: gpio
+    id: relay3
+    pin:
+      mcp23008: mcp23008_hub
+      number: 3
+      mode: OUTPUT
+      inverted: true
+
+script:
+  - id: start_pump
+    then:
+      - output.turn_on: direction_pin0_m1
+      - output.turn_off: direction_pin1_m1
+      - output.set_level:
+          id: speed_pin_m1
+          level: 100%
+  - id: stop_pump
+    then:
+      - output.turn_off: direction_pin0_m1
+      - output.turn_off: direction_pin1_m1
+      - output.set_level:
+          id: speed_pin_m1
+          level: 0
+
+switch:
+  - platform: template
+    name: '${node_name} Pump'
+    optimistic: true
+    turn_on_action:
+      - script.execute: start_pump
+      - delay: 0.1s
+      - output.set_level:
+          id: speed_pin_m1
+          level: 60%
+    turn_off_action:
+      - script.execute: stop_pump
+  # relay controls
+  - platform: output
+    name: '${node_name} Relay 1'
+    output: relay1
+  - platform: output
+    name: '${node_name} Relay 2'
+    output: relay2
+  - platform: output
+    name: '${node_name} Relay 3'
+    output: relay3

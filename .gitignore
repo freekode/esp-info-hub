@@ -10,7 +10,8 @@
 
 .idea
 
-secrets.yaml
+common/secrets.yaml
 
 .DS_Store
 venv/
+build/
