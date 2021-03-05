@@ -2,28 +2,15 @@ substitutions:
   node_name: esp32-cam
 
 esphome:
-  name: test_esp32-cam
   platform: ESP32
   board: esp32cam
 
+packages:
+  node_base: !include common/node_base.yaml
+
 wifi:
-  power_save_mode: HIGH
-  fast_connect: on
-  ssid: "UPCB7751E2"
-  password: !secret wifi_password
   manual_ip:
-    static_ip: 192.168.0.130
-    gateway: 192.168.0.1
-    subnet: 255.255.255.0
-    dns1: 1.1.1.1
-
-logger:
-
-api:
-
-ota:
-
-i2c:
+    static_ip: 192.168.0.122
 
 output:
   - platform: gpio
@@ -38,15 +25,13 @@ light:
 esp32_camera:
   name: My Camera
   external_clock:
-    pin: GPIO27
+    pin: GPIO0
     frequency: 20MHz
   i2c_pins:
-    sda: GPIO25
-    scl: GPIO23
-  data_pins: [GPIO17, GPIO35, GPIO34, GPIO5, GPIO39, GPIO18, GPIO36, GPIO19]
-  vsync_pin: GPIO22
-  href_pin: GPIO26
-  pixel_clock_pin: GPIO21
-  reset_pin: GPIO15
-  resolution: 640x480
-  jpeg_quality: 10
+    sda: GPIO26
+    scl: GPIO27
+  data_pins: [GPIO5, GPIO18, GPIO19, GPIO21, GPIO36, GPIO39, GPIO34, GPIO35]
+  vsync_pin: GPIO25
+  href_pin: GPIO23
+  pixel_clock_pin: GPIO22
+  power_down_pin: GPIO32
