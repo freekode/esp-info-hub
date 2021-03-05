@@ -2,6 +2,17 @@ esphome:
   name: ${node_name}_node
   build_path: ../build/${node_name}
 
+wifi:
+  power_save_mode: HIGH
+  fast_connect: on
+  ssid: "UPCB7751E2"
+  password: !secret wifi_password
+  manual_ip:
+    gateway: 192.168.0.1
+    subnet: 255.255.255.0
+    dns1: 1.1.1.1
+
+
 logger:
 
 web_server:
@@ -11,3 +22,7 @@ api:
 ota:
 
 i2c:
+
+time:
+  - platform: sntp
+    id: sntp_time

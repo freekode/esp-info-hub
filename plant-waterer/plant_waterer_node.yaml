@@ -6,7 +6,6 @@ esphome:
   board: nodemcuv2
 
 packages:
-  wifi: !include ../common/wifi.yaml
   node_base: !include ../common/node_base.yaml
 
 mcp23008:
