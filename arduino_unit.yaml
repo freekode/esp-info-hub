@@ -1,4 +1,0 @@
-esphome:
-  name: arduino_unit
-  platform: atmelavr
-  board: nanoatmega328

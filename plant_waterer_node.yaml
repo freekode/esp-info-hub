@@ -8,6 +8,10 @@ esphome:
 packages:
   node_base: !include ../common/node_base.yaml
 
+wifi:
+  manual_ip:
+    static_ip: 192.168.0.121
+
 mcp23008:
   - id: 'mcp23008_hub'
     address: 0x20

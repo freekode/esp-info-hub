@@ -8,6 +8,7 @@ wifi:
   ssid: "UPCB7751E2"
   password: !secret wifi_password
   manual_ip:
+    # <static_ip: 0.0.0.0> add in your configuration
     gateway: 192.168.0.1
     subnet: 255.255.255.0
     dns1: 1.1.1.1
