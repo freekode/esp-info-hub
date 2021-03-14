@@ -13,8 +13,18 @@ wifi:
     static_ip: 192.168.0.121
 
 mcp23008:
-  - id: 'mcp23008_hub'
+  - id: mcp23008_hub
     address: 0x20
+
+time:
+  - platform: sntp
+    id: sntp_time
+    on_time:
+      - cron: '* /5 * * * *'
+        then:
+          - switch.turn_on: switch_pump
+          - delay: 1m
+          - switch.turn_off: switch_pump
 
 output:
   # motor controls
@@ -74,6 +84,7 @@ script:
 
 switch:
   - platform: template
+    id: switch_pump
     name: '${node_name} Pump'
     optimistic: true
     turn_on_action:

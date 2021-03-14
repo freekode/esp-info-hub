@@ -12,6 +12,10 @@ wifi:
   manual_ip:
     static_ip: 192.168.0.120
 
+time:
+  - platform: sntp
+    id: sntp_time
+
 sensor:
   - platform: homeassistant
     id: airly_aqi

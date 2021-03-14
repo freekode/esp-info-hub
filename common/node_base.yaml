@@ -24,6 +24,3 @@ ota:
 
 i2c:
 
-time:
-  - platform: sntp
-    id: sntp_time
