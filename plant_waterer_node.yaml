@@ -6,7 +6,7 @@ esphome:
   board: nodemcuv2
 
 packages:
-  node_base: !include ../common/node_base.yaml
+  node_base: !include common/node_base.yaml
 
 wifi:
   manual_ip:
@@ -20,11 +20,12 @@ time:
   - platform: sntp
     id: sntp_time
     on_time:
-      - cron: '* /5 * * * *'
+      - seconds: 0
+        minutes: 0
+        hours: 10
+        days_of_week: TUE,FRI
         then:
-          - switch.turn_on: switch_pump
-          - delay: 1m
-          - switch.turn_off: switch_pump
+          - script.execute: run_pump_for_ten_min
 
 output:
   # motor controls
@@ -74,6 +75,11 @@ script:
       - output.set_level:
           id: speed_pin_m1
           level: 100%
+      - delay: 0.1s
+      - output.set_level:
+          id: speed_pin_m1
+          level: 60%
+
   - id: stop_pump
     then:
       - output.turn_off: direction_pin0_m1
@@ -82,26 +88,38 @@ script:
           id: speed_pin_m1
           level: 0
 
+  - id: run_pump_for_ten_min
+    then:
+      - switch.turn_on: switch_pump
+      - delay: 10min
+      - switch.turn_off: switch_pump
+
+
+
 switch:
   - platform: template
+    id: run_pump
+    name: '${node_name} run one min'
+    optimistic: true
+    turn_on_action:
+      - script.execute: run_pump_for_ten_min
+
+  # pump control
+  - platform: template
     id: switch_pump
-    name: '${node_name} Pump'
+    name: '${node_name} pump'
     optimistic: true
     turn_on_action:
       - script.execute: start_pump
-      - delay: 0.1s
-      - output.set_level:
-          id: speed_pin_m1
-          level: 60%
     turn_off_action:
       - script.execute: stop_pump
   # relay controls
   - platform: output
-    name: '${node_name} Relay 1'
+    name: '${node_name} relay 1'
     output: relay1
   - platform: output
-    name: '${node_name} Relay 2'
+    name: '${node_name} relay 2'
     output: relay2
   - platform: output
-    name: '${node_name} Relay 3'
+    name: '${node_name} relay 3'
     output: relay3
