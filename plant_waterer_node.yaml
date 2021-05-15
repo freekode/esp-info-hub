@@ -25,7 +25,11 @@ time:
         hours: 10
         days_of_week: TUE,FRI
         then:
-          - script.execute: run_pump_for_ten_min
+          - if:
+              condition:
+                switch.is_on: watering_enabled
+              then:
+                - script.execute: run_pump_for_ten_min
 
 output:
   # motor controls
@@ -35,37 +39,71 @@ output:
   - platform: gpio
     id: direction_pin0_m1
     pin:
-      mcp23008: mcp23008_hub
+      mcp23xxx: mcp23008_hub
       number: 7
       mode: OUTPUT
   - platform: gpio
     id: direction_pin1_m1
     pin:
-      mcp23008: mcp23008_hub
+      mcp23xxx: mcp23008_hub
       number: 6
       mode: OUTPUT
   # relay controls
   - platform: gpio
     id: relay1
     pin:
-      mcp23008: mcp23008_hub
+      mcp23xxx: mcp23008_hub
       number: 5
       mode: OUTPUT
       inverted: true
   - platform: gpio
     id: relay2
     pin:
-      mcp23008: mcp23008_hub
+      mcp23xxx: mcp23008_hub
       number: 4
       mode: OUTPUT
       inverted: true
   - platform: gpio
     id: relay3
     pin:
-      mcp23008: mcp23008_hub
+      mcp23xxx: mcp23008_hub
       number: 3
       mode: OUTPUT
       inverted: true
+
+switch:
+  - platform: template
+    id: watering_enabled
+    name: '${node_name} Watering Enabled'
+    restore_state: true
+    optimistic: true
+
+  - platform: template
+    id: run_pump
+    name: '${node_name} run ten min'
+    optimistic: true
+    turn_on_action:
+      - script.execute: run_pump_for_ten_min
+
+  # pump control
+  - platform: template
+    id: switch_pump
+    name: '${node_name} pump'
+    optimistic: true
+    turn_on_action:
+      - script.execute: start_pump
+    turn_off_action:
+      - script.execute: stop_pump
+  # relay controls
+  - platform: output
+    name: '${node_name} relay 1'
+    output: relay1
+  - platform: output
+    name: '${node_name} relay 2'
+    output: relay2
+  - platform: output
+    name: '${node_name} relay 3'
+    output: relay3
 
 script:
   - id: start_pump
@@ -93,33 +131,3 @@ script:
       - switch.turn_on: switch_pump
       - delay: 10min
       - switch.turn_off: switch_pump
-
-
-
-switch:
-  - platform: template
-    id: run_pump
-    name: '${node_name} run one min'
-    optimistic: true
-    turn_on_action:
-      - script.execute: run_pump_for_ten_min
-
-  # pump control
-  - platform: template
-    id: switch_pump
-    name: '${node_name} pump'
-    optimistic: true
-    turn_on_action:
-      - script.execute: start_pump
-    turn_off_action:
-      - script.execute: stop_pump
-  # relay controls
-  - platform: output
-    name: '${node_name} relay 1'
-    output: relay1
-  - platform: output
-    name: '${node_name} relay 2'
-    output: relay2
-  - platform: output
-    name: '${node_name} relay 3'
-    output: relay3
