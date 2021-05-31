@@ -29,7 +29,7 @@ time:
               condition:
                 switch.is_on: watering_enabled
               then:
-                - script.execute: run_pump_for_ten_min
+                - script.execute: run_pump_for_five_min
 
 output:
   # motor controls
@@ -74,16 +74,19 @@ output:
 switch:
   - platform: template
     id: watering_enabled
-    name: '${node_name} Watering Enabled'
+    name: '${node_name} watering enabled'
+    assumed_state: true
     restore_state: true
     optimistic: true
 
   - platform: template
     id: run_pump
-    name: '${node_name} run ten min'
+    name: '${node_name} run five min'
     optimistic: true
     turn_on_action:
-      - script.execute: run_pump_for_ten_min
+      - script.execute: run_pump_for_five_min
+    turn_off_action:
+      - script.stop: run_pump_for_five_min
 
   # pump control
   - platform: template
@@ -105,6 +108,28 @@ switch:
     name: '${node_name} relay 3'
     output: relay3
 
+sensor:
+  - platform: ultrasonic
+    id: ultrasonic_sensor
+    trigger_pin: D6 # blue
+    echo_pin: D4 # green 
+  
+  - platform: template
+    name: '${node_name} water level'
+    lambda: |-
+      return (27 - (id(ultrasonic_sensor).state * 100)) * 100 / (27 - 4.5);
+
+binary_sensor:
+  - platform: gpio
+    id: water_leak_sensor
+    device_class: moisture
+    name: '${node_name} water leak'
+    pin: 
+      number: D7
+      inverted: true
+    filters:
+      - delayed_on_off: 1s
+
 script:
   - id: start_pump
     then:
@@ -116,7 +141,7 @@ script:
       - delay: 0.1s
       - output.set_level:
           id: speed_pin_m1
-          level: 60%
+          level: 50%
 
   - id: stop_pump
     then:
@@ -126,8 +151,8 @@ script:
           id: speed_pin_m1
           level: 0
 
-  - id: run_pump_for_ten_min
+  - id: run_pump_for_five_min
     then:
       - switch.turn_on: switch_pump
-      - delay: 10min
+      - delay: 5min
       - switch.turn_off: switch_pump
