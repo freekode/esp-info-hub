@@ -23,7 +23,7 @@ time:
       - seconds: 0
         minutes: 0
         hours: 10
-        days_of_week: TUE,FRI
+        days_of_week: THU
         then:
           - if:
               condition:
