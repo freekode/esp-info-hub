@@ -1,5 +1,5 @@
 substitutions:
-  node_name: info_hub
+  node_name: info-hub
 
 esphome:
   platform: ESP8266
@@ -18,7 +18,7 @@ time:
 
 sensor:
   - platform: homeassistant
-    id: airly_aqi
+    id: outside_aqi
     name: "Airly CAQI"
     entity_id: sensor.airly_air_quality_index
     internal: true
@@ -43,12 +43,12 @@ sensor:
             }
 
   - platform: homeassistant
-    id: airly_temperature
-    entity_id: sensor.airly_temperature
+    id: outside_temperature
+    entity_id: sensor.openweathermap_temperature
     internal: true
   - platform: homeassistant
-    id: airly_humidity
-    entity_id: sensor.airly_humidity
+    id: outside_humidity
+    entity_id: sensor.openweathermap_humidity
     internal: true
 
   - platform: bme680
@@ -114,6 +114,6 @@ display:
       it.printf(17, 2, "%.0f", id(aqi).state);
 
       it.printf(0,  3, "O");
-      it.printf(3,  3, "%.1ft", id(airly_temperature).state);
-      it.printf(11, 3, "%.0f%%", id(airly_humidity).state);
-      it.printf(17, 3, "%.0f", id(airly_aqi).state);
+      it.printf(3,  3, "%.1ft", id(outside_temperature).state);
+      it.printf(11, 3, "%.0f%%", id(outside_humidity).state);
+      it.printf(17, 3, "%.0f", id(outside_aqi).state);
