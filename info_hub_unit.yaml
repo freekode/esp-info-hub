@@ -16,6 +16,10 @@ time:
   - platform: sntp
     id: sntp_time
 
+external_components:
+  - source: github://martgras/esphome@hm3301-idf
+    components: ["hm3301"]
+
 sensor:
   - platform: homeassistant
     id: outside_aqi
