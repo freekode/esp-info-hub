@@ -15,6 +15,17 @@ wifi:
 time:
   - platform: sntp
     id: sntp_time
+    on_time:
+      - hours: 7
+        minutes: 0
+        seconds: 0
+        then:
+          - switch.turn_on: backlights
+      - hours: 23
+        minutes: 0
+        seconds: 0
+        then:
+          - switch.turn_off: backlights
 
 sensor:
   - platform: homeassistant
@@ -83,6 +94,7 @@ sensor:
 
 switch:
   - platform: template
+    id: backlights
     name: "Backlights"
     assumed_state: true
     optimistic: true

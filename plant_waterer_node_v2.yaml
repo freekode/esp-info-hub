@@ -1,9 +1,9 @@
 substitutions:
-  node_name: plant-waterer
+  node_name: plant_waterer
 
 esphome:
   platform: ESP8266
-  board: d1_mini
+  board: nodemcuv2
 
 packages:
   node_base: !include common/node_base.yaml
@@ -11,6 +11,10 @@ packages:
 wifi:
   manual_ip:
     static_ip: 192.168.0.121
+
+mcp23008:
+  - id: mcp23008_hub
+    address: 0x20
 
 time:
   - platform: sntp
@@ -29,15 +33,43 @@ time:
 
 output:
   # motor controls
+  - platform: esp8266_pwm
+    pin: D5
+    id: speed_pin_m1
   - platform: gpio
     id: direction_pin0_m1
-    pin: D6
+    pin:
+      mcp23xxx: mcp23008_hub
+      number: 7
+      mode: OUTPUT
   - platform: gpio
     id: direction_pin1_m1
-    pin: D5
-  - platform: esp8266_pwm
-    pin: D7
-    id: speed_pin_m1
+    pin:
+      mcp23xxx: mcp23008_hub
+      number: 6
+      mode: OUTPUT
+  # relay controls
+  - platform: gpio
+    id: relay1
+    pin:
+      mcp23xxx: mcp23008_hub
+      number: 5
+      mode: OUTPUT
+      inverted: true
+  - platform: gpio
+    id: relay2
+    pin:
+      mcp23xxx: mcp23008_hub
+      number: 4
+      mode: OUTPUT
+      inverted: true
+  - platform: gpio
+    id: relay3
+    pin:
+      mcp23xxx: mcp23008_hub
+      number: 3
+      mode: OUTPUT
+      inverted: true
 
 switch:
   - platform: template
@@ -65,6 +97,38 @@ switch:
       - script.execute: start_pump
     turn_off_action:
       - script.execute: stop_pump
+  # relay controls
+  - platform: output
+    name: '${node_name} relay 1'
+    output: relay1
+  - platform: output
+    name: '${node_name} relay 2'
+    output: relay2
+  - platform: output
+    name: '${node_name} relay 3'
+    output: relay3
+
+sensor:
+  - platform: ultrasonic
+    id: ultrasonic_sensor
+    trigger_pin: D6 # blue
+    echo_pin: D4 # green 
+  
+  - platform: template
+    name: '${node_name} water level'
+    lambda: |-
+      return (27 - (id(ultrasonic_sensor).state * 100)) * 100 / (27 - 4.5);
+
+binary_sensor:
+  - platform: gpio
+    id: water_leak_sensor
+    device_class: moisture
+    name: '${node_name} water leak'
+    pin: 
+      number: D7
+      inverted: true
+    filters:
+      - delayed_on_off: 1s
 
 script:
   - id: start_pump
