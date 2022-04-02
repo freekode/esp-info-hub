@@ -21,7 +21,7 @@ display:
   - platform: ssd1306_i2c
     model: "SSD1306 128x32"
     id: screen
-    brightness: 10%
+    contrast: 10%
     lambda: |-
       it.print(0, 0, id(font1), "Hello World!");
 
