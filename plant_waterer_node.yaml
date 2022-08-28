@@ -26,13 +26,40 @@ output:
 
 switch:
   - platform: template
-    id: run_pump
-    name: '${node_name} run five min'
+    id: run_pump_5min_sw
+    name: '${node_name} run 5min'
     optimistic: true
     turn_on_action:
-      - script.execute: run_pump_for_five_min
+      - script.execute: run_pump_5min
     turn_off_action:
-      - script.stop: run_pump_for_five_min
+      - script.stop: run_pump_5min
+
+  - platform: template
+    id: run_pump_10min_sw
+    name: '${node_name} run 10min'
+    optimistic: true
+    turn_on_action:
+      - script.execute: run_pump_10min
+    turn_off_action:
+      - script.stop: run_pump_10min
+
+  - platform: template
+    id: run_pump_15min_sw
+    name: '${node_name} run 15min'
+    optimistic: true
+    turn_on_action:
+      - script.execute: run_pump_15min
+    turn_off_action:
+      - script.stop: run_pump_15min
+
+  - platform: template
+    id: run_pump_30min_sw
+    name: '${node_name} run 30min'
+    optimistic: true
+    turn_on_action:
+      - script.execute: run_pump_30min
+    turn_off_action:
+      - script.stop: run_pump_30min
 
   # pump control
   - platform: template
@@ -65,8 +92,26 @@ script:
           id: speed_pin_m1
           level: 0
 
-  - id: run_pump_for_five_min
+  - id: run_pump_5min
     then:
       - switch.turn_on: switch_pump
       - delay: 5min
+      - switch.turn_off: switch_pump
+
+  - id: run_pump_10min
+    then:
+      - switch.turn_on: switch_pump
+      - delay: 10min
+      - switch.turn_off: switch_pump
+
+  - id: run_pump_15min
+    then:
+      - switch.turn_on: switch_pump
+      - delay: 15min
+      - switch.turn_off: switch_pump
+
+  - id: run_pump_30min
+    then:
+      - switch.turn_on: switch_pump
+      - delay: 30min
       - switch.turn_off: switch_pump

@@ -1,5 +1,5 @@
 substitutions:
-  node_name: cam_01
+  node_name: cam-esp
 
 esphome:
   platform: ESP32
@@ -10,11 +10,24 @@ packages:
 
 wifi:
   manual_ip:
-    static_ip: 192.168.0.122
+    static_ip: 192.168.1.122
+
+deep_sleep:
+  id: deep_sleep_1
 
 time:
   - platform: sntp
     id: sntp_time
+    on_time:
+      - seconds: 0
+        minutes: 0
+        hours: 20
+        then:
+          - deep_sleep.enter:
+              id: deep_sleep_1
+              until: '8:00:00'
+              time_id: sntp_time
+
 
 output:
   - platform: gpio
