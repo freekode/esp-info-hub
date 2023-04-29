@@ -6,7 +6,7 @@ esphome:
   board: nodemcuv2
 
 packages:
-  node_base: !include common/node_base.yaml
+  node_base: !include ../common/node_base.yaml
 
 wifi:
   manual_ip:

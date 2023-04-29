@@ -6,7 +6,7 @@ esphome:
   board: esp32cam
 
 packages:
-  node_base: !include common/node_base.yaml
+  node_base: !include ../common/node_base.yaml
 
 wifi:
   manual_ip:
@@ -23,16 +23,7 @@ time:
         minutes: 0
         hours: 20
         then:
-          - deep_sleep.enter:
-              id: deep_sleep_1
-              until: '8:00:00'
-              time_id: sntp_time
-
-
-output:
-  - platform: gpio
-    pin: GPIO4
-    id: light_gpio
+          - script.execute: go_sleep
 
 binary_sensor:
   - platform: gpio
@@ -40,14 +31,14 @@ binary_sensor:
     name: ${node_name} motion sensor
     device_class: motion
 
-switch:
+button:
   - platform: restart
-    name: ${node_name} restart
+    id: restart_btn
 
-light:
-  - platform: binary
-    output: light_gpio
-    name: ${node_name} light
+  - platform: template
+    name: ${node_name} go sleep
+    on_press:
+      - script.execute: go_sleep
 
 esp32_camera:
   name: ${node_name} camera
@@ -61,5 +52,15 @@ esp32_camera:
   vsync_pin: GPIO25
   href_pin: GPIO23
   pixel_clock_pin: GPIO22
+  power_down_pin: GPIO32
   resolution: 1024x768
   max_framerate: 2fps
+
+
+script:
+  - id: go_sleep
+    then:
+      - deep_sleep.enter:
+          id: deep_sleep_1
+          until: '8:00:00'
+          time_id: sntp_time

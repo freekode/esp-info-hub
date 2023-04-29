@@ -6,7 +6,7 @@ esphome:
   board: d1_mini
 
 packages:
-  node_base: !include common/node_base.yaml
+  node_base: !include ../common/node_base.yaml
 
 wifi:
   manual_ip:
