@@ -117,6 +117,7 @@ tm1651:
 display:
   - platform: lcd_pcf8574
     id: screen
+    update_interval: 5s
     dimensions: 20x4
     address: 0x27
     lambda: |-
