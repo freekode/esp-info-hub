@@ -55,12 +55,14 @@ sensor:
 
   - platform: homeassistant
     id: outside_temperature
-    entity_id: sensor.openweathermap_temperature
+    entity_id: sensor.temp_sonoff_one_temperature
     internal: true
+
   - platform: homeassistant
     id: outside_humidity
-    entity_id: sensor.openweathermap_humidity
+    entity_id: sensor.temp_sonoff_one_humidity
     internal: true
+
 
   - platform: bme680
     temperature:
