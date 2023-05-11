@@ -16,16 +16,14 @@ time:
   - platform: sntp
     id: sntp_time
     on_time:
-      - hours: 7
-        minutes: 0
-        seconds: 0
+      - seconds: /30
         then:
-          - switch.turn_on: backlights
-      - hours: 23
-        minutes: 0
-        seconds: 0
-        then:
-          - switch.turn_off: backlights
+          - lambda: |-
+              if (id(sntp_time).now().hour >= 7 && id(sntp_time).now().hour < 23) {
+                id(backlights).turn_on();
+              } else {
+                id(backlights).turn_off();
+              }
 
 sensor:
   - platform: homeassistant
@@ -55,12 +53,12 @@ sensor:
 
   - platform: homeassistant
     id: outside_temperature
-    entity_id: sensor.temp_sonoff_one_temperature
+    entity_id: sensor.balcony_temp
     internal: true
 
   - platform: homeassistant
     id: outside_humidity
-    entity_id: sensor.temp_sonoff_one_humidity
+    entity_id: sensor.balcony_humid
     internal: true
 
 
