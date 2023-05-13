@@ -1,0 +1,40 @@
+substitutions:
+  node_name: cam-two
+
+packages:
+  node_base: !include ../common/node_base.yaml
+
+esphome:
+  platform: ESP32
+  board: m5stack-timer-cam
+  platformio_options:
+    upload_speed: 115200
+
+wifi:
+  manual_ip:
+    static_ip: 192.168.1.123
+
+i2c:
+  # - id: input_bus
+  #   scl: GPIO13
+  #   sda: GPIO4
+  - id: rtc_bus
+    scl: GPIO14
+    sda: GPIO12
+  
+esp32_camera:
+  name: camera
+  external_clock:
+    pin: GPIO27
+    frequency: 20MHz
+  i2c_pins:
+    sda: GPIO25
+    scl: GPIO23
+  data_pins: [GPIO32, GPIO35, GPIO34, GPIO5, GPIO39, GPIO18, GPIO36, GPIO19]
+  vsync_pin: GPIO22
+  href_pin: GPIO26
+  pixel_clock_pin: GPIO21
+  reset_pin: GPIO15
+
+  resolution: 1024x768
+  max_framerate: 2fps

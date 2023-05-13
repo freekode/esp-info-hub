@@ -7,6 +7,7 @@ esphome:
 
 packages:
   node_base: !include ../common/node_base.yaml
+  api: !include ../common/api.yaml
 
 wifi:
   manual_ip:

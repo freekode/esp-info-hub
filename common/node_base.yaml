@@ -18,9 +18,6 @@ logger:
 
 web_server:
 
-api:
-  reboot_timeout: 1min
-
 ota:
 
 i2c:
