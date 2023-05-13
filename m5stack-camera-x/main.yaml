@@ -21,7 +21,37 @@ i2c:
   - id: rtc_bus
     scl: GPIO14
     sda: GPIO12
-  
+
+binary_sensor:
+  - platform: gpio
+    name: button
+    pin:
+      number: GPIO37
+      inverted: true
+    device_class: connectivity
+
+sensor:
+  - platform: adc
+    name: 'Battery Voltage'
+    pin: GPIO38
+    filters:
+      multiply: 3.3
+
+output:
+  - platform: gpio
+    id: led_output
+    pin: GPIO2
+
+light:
+  - platform: binary
+    name: led
+    output: led_output
+
+switch:
+  - platform: gpio
+    pin: GPIO33
+    name: 'Battery On'
+
 esp32_camera:
   name: camera
   external_clock:
