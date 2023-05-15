@@ -1,0 +1,32 @@
+substitutions:
+  node_name: matrix
+
+packages:
+  node_base: !include ../common/node_base.yaml
+  api: !include ../common/api.yaml
+
+esphome:
+  platform: ESP32
+  board: m5stack-atom
+  platformio_options:
+    upload_speed: 115200
+
+wifi:
+  manual_ip:
+    static_ip: 192.168.1.124
+
+i2c:
+  sda: 25
+  scl: 21
+
+light:
+  - platform: fastled_clockless
+    name: "5x5 Matrix"
+    id: matrix_light
+    pin: 27
+    chipset: WS2812
+    num_leds: 25
+    color_correct: [40%, 40%, 40%]
+    effects:
+      - addressable_rainbow:
+          name: rainbow
