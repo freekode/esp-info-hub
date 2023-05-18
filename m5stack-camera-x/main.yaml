@@ -55,15 +55,15 @@ mqtt:
 #     filters:
 #       multiply: 3.3
 
-# output:
+# img_mqtt_packetput:
 #   - platform: gpio
-#     id: led_output
+#     id: led_img_mqtt_packetput
 #     pin: GPIO2
 
 # light:
 #   - platform: binary
 #     name: led
-#     output: led_output
+#     img_mqtt_packetput: led_img_mqtt_packetput
 
 # switch:
 #   - platform: gpio
@@ -90,15 +90,24 @@ esp32_camera:
   on_image:
     then:
       - lambda: |-
-            uint16_t max_packet_len = 4000;
-            ESP_LOGD("main", "Length %d", image.length);
+            uint16_t max_packet_len = 2000;
 
-            uint8_t packets = image.length / 
+            uint16_t img_start_index = 0;
+            uint16_t img_end_index = max_packet_len;
+            while (img_start_index < image.length) {
+              std::string img_mqtt_packet;
+  
+              for (uint16_t i = img_start_index; i < img_end_index; i++) {
+                img_mqtt_packet = img_mqtt_packet.append(format_hex(image.data[i]));
+              }
 
-            # std::string out;
-            # for (int i = 0; i < 5000; i++) {
-            #   out = out.append(format_hex_pretty(image.data[i]));
-            # }
+              ESP_LOGD("main", "len %d", img_mqtt_packet.length());
+
+              ESP_LOGD("main", "test1 %d; %c", image.data[1000], (char) image.data[1000]);
+
+              img_start_index += max_packet_len;
+              img_end_index = (img_end_index + max_packet_len) > image.length ? image.length : img_end_index + max_packet_len;
+            }
 
             # bool result = id(mqtt_client).publish("cam/image", out);
             # ESP_LOGD("main", "len %d, done %d", out.length(), result);
