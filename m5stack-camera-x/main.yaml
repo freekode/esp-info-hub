@@ -90,7 +90,7 @@ esp32_camera:
   on_image:
     then:
       - lambda: |-
-            uint16_t max_packet_len = 2000;
+            uint16_t max_packet_len = 1000;
 
             uint16_t img_start_index = 0;
             uint16_t img_end_index = max_packet_len;
@@ -101,13 +101,10 @@ esp32_camera:
                 img_mqtt_packet = img_mqtt_packet.append(format_hex(image.data[i]));
               }
 
-              ESP_LOGD("main", "len %d", img_mqtt_packet.length());
-
-              ESP_LOGD("main", "test1 %d; %c", image.data[1000], (char) image.data[1000]);
+              delay(0);
+              bool result = id(mqtt_client).publish("cam/image", img_mqtt_packet);
+              ESP_LOGD("main", "len %d, done %d", img_mqtt_packet.length(), result);
 
               img_start_index += max_packet_len;
               img_end_index = (img_end_index + max_packet_len) > image.length ? image.length : img_end_index + max_packet_len;
             }
-
-            # bool result = id(mqtt_client).publish("cam/image", out);
-            # ESP_LOGD("main", "len %d, done %d", out.length(), result);
