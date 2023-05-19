@@ -25,50 +25,12 @@ i2c:
 mqtt:
   id: mqtt_client
   broker: 192.168.1.105
-
-# time:
-#   - platform: pcf85063
-#     id: pcf85063_time
-#     update_interval: never
-#   - platform: sntp
-#     id: sntp_time
-#     on_time_sync:
-#       then:
-#         pcf85063.write_time:
-
-# deep_sleep:
-#   run_duration: 20s
-#   sleep_duration: 24h
-
-# binary_sensor:
-#   - platform: gpio
-#     name: button
-#     pin:
-#       number: GPIO37
-#       inverted: true
-#     device_class: connectivity
-
-# sensor:
-#   - platform: adc
-#     name: 'Battery Voltage'
-#     pin: GPIO38
-#     filters:
-#       multiply: 3.3
-
-# img_mqtt_packetput:
-#   - platform: gpio
-#     id: led_img_mqtt_packetput
-#     pin: GPIO2
-
-# light:
-#   - platform: binary
-#     name: led
-#     img_mqtt_packetput: led_img_mqtt_packetput
-
-# switch:
-#   - platform: gpio
-#     pin: GPIO33
-#     name: 'Battery On'
+  on_message:
+    topic: cam/image
+    qos: 1
+    then:
+      - lambda: |-
+          ESP_LOGD("main", "message on %d", x.length());
 
 esp32_camera:
   name: camera
@@ -85,26 +47,15 @@ esp32_camera:
   reset_pin: GPIO15
 
   # resolution: 1024x768
-  max_framerate: 2fps
+  max_framerate: 1fps
 
   on_image:
     then:
       - lambda: |-
-            uint16_t max_packet_len = 1000;
+          const char* image_data_char = reinterpret_cast<char*>(const_cast<uint8_t*>(image.data));
 
-            uint16_t img_start_index = 0;
-            uint16_t img_end_index = max_packet_len;
-            while (img_start_index < image.length) {
-              std::string img_mqtt_packet;
-  
-              for (uint16_t i = img_start_index; i < img_end_index; i++) {
-                img_mqtt_packet = img_mqtt_packet.append(format_hex(image.data[i]));
-              }
+          std::string encodedData = base64_encode(&image_data_char[0], 4000);
+          ESP_LOGD("main", "base64 len=%d", encodedData.length());
 
-              delay(0);
-              bool result = id(mqtt_client).publish("cam/image", img_mqtt_packet);
-              ESP_LOGD("main", "len %d, done %d", img_mqtt_packet.length(), result);
-
-              img_start_index += max_packet_len;
-              img_end_index = (img_end_index + max_packet_len) > image.length ? image.length : img_end_index + max_packet_len;
-            }
+          bool result = id(mqtt_client).publish("cam/image", encodedData, 1);
+          ESP_LOGD("main", "result %d", result);
