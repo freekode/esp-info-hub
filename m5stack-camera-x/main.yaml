@@ -46,16 +46,32 @@ esp32_camera:
   pixel_clock_pin: GPIO21
   reset_pin: GPIO15
 
-  # resolution: 1024x768
+  resolution: 1024x768
   max_framerate: 1fps
 
   on_image:
-    then:
-      - lambda: |-
-          const char* image_data_char = reinterpret_cast<char*>(const_cast<uint8_t*>(image.data));
+    if:
+      condition:
+        wifi.connected:
+      then:
+        - lambda: |-
+            uint16_t max_packet_len = 5000;
 
-          std::string encodedData = base64_encode(&image_data_char[0], 4000);
-          ESP_LOGD("main", "base64 len=%d", encodedData.length());
+            const char* image_data_char = reinterpret_cast<char*>(image.data);
+            std::string encodedData = base64_encode(&image_data_char[0], image.length);
+            ESP_LOGD("main", "base64 len=%d", encodedData.length());
 
-          bool result = id(mqtt_client).publish("cam/image", encodedData, 1);
-          ESP_LOGD("main", "result %d", result);
+            uint8_t packets = (encodedData.length() + max_packet_len - 1) / max_packet_len;
+            uint16_t img_start_index = 0;
+            std::string mqtt_packet;
+            for (uint16_t i = 0, img_start_index = 0; i < packets; i++, img_start_index += max_packet_len) {
+              mqtt_packet = encodedData.substr(img_start_index, max_packet_len);
+
+              bool result = id(mqtt_client).publish_json("cam/image", [=](JsonObject root) {
+                root["packetNo"] = i + 1;
+                root["packetsAmount"] = packets;
+                root["data"] = mqtt_packet;
+              });
+              ESP_LOGD("main", "packet len %d, result %d", mqtt_packet.length(), result);
+              delay(100);
+            }
