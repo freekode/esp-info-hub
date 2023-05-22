@@ -48,6 +48,7 @@ esp32_camera:
 
   resolution: 1024x768
   max_framerate: 1fps
+  idle_framerate: 0.05fps
 
   on_image:
     if:
@@ -56,6 +57,8 @@ esp32_camera:
       then:
         - lambda: |-
             uint16_t max_packet_len = 5000;
+            uint8_t max_packet_send_attempts = 5;
+            std::string mqtt_topic("cam/image");
 
             const char* image_data_char = reinterpret_cast<char*>(image.data);
             std::string encodedData = base64_encode(&image_data_char[0], image.length);
@@ -63,15 +66,23 @@ esp32_camera:
 
             uint8_t packets = (encodedData.length() + max_packet_len - 1) / max_packet_len;
             uint16_t img_start_index = 0;
-            std::string mqtt_packet;
+            std::string img_data_packet;
             for (uint16_t i = 0, img_start_index = 0; i < packets; i++, img_start_index += max_packet_len) {
-              mqtt_packet = encodedData.substr(img_start_index, max_packet_len);
+              img_data_packet = encodedData.substr(img_start_index, max_packet_len);
 
-              bool result = id(mqtt_client).publish_json("cam/image", [=](JsonObject root) {
+              json::json_build_t json_callback = [=](JsonObject root) {
                 root["packetNo"] = i + 1;
                 root["packetsAmount"] = packets;
-                root["data"] = mqtt_packet;
-              });
-              ESP_LOGD("main", "packet len %d, result %d", mqtt_packet.length(), result);
+                root["data"] = img_data_packet;
+              };
+
+              for (uint8_t i = 0; i < max_packet_send_attempts; i++) {
+                bool result = id(mqtt_client).publish_json(mqtt_topic, json_callback);
+                ESP_LOGD("main", "packet len %d, result %d, attempt %d", img_data_packet.length(), result, i);  
+                if (result) {
+                  break;
+                }
+                delay(50);
+              }
               delay(100);
             }
