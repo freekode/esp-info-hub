@@ -1,5 +1,5 @@
 esphome:
-  name: ${node_name}-node
+  name: ${node_name}_node
   build_path: ../build/${node_name}
 
 wifi:
